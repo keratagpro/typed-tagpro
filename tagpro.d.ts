@@ -116,6 +116,10 @@ declare namespace TagPro {
 	interface Layers {
 		background: PIXI.DisplayObjectContainer;
 		foreground: PIXI.DisplayObjectContainer;
+		midground: PIXI.DisplayObjectContainer;
+		overlay: PIXI.SpriteBatch;
+		splats: PIXI.DisplayObjectContainer;
+		ui: PIXI.DisplayObjectContainer;
 	}
 
 	interface Map extends Array<Array<number|string>> {
@@ -173,9 +177,56 @@ declare namespace TagPro {
 	}
 
 	interface Player {
-		flag: number;
+		ac: number;
+		auth: boolean;
+		bomb: boolean;
+		dead: boolean;
 		degree: number;
-		sprites: { degrees: PIXI.Sprite, info: PIXI.Sprite };
+		draw: boolean;
+		flag: number;
+		grip: boolean;
+		lastFrame: { [id: string]: number };
+		lx: number;
+		ly: number;
+		ms: number;
+		name: string;
+		potatoFlag: boolean;
+		rotateFlairSpeed: number;
+		selfDestructSoon: boolean;
+		sprite: PIXI.Sprite;
+		tagpro: boolean;
+		team: number;
+		tween: any;
+		toUpdate: boolean;
+		x: number;
+		y: number;
+
+		flair: {
+			x: number;
+			y: number;
+			description: string;
+		}
+
+		sprites: {
+			emitter: any; // NOTE: cloudkid.Emitter
+			rotation: number;
+
+			actualBall: PIXI.Sprite;
+			ball: PIXI.Sprite;
+			bomb: PIXI.Graphics;
+			degrees: PIXI.Sprite;
+			flag: PIXI.Sprite;
+			flagLayer: PIXI.DisplayObjectContainer;
+			flair: PIXI.Sprite;
+			grip: PIXI.Sprite;
+			info: PIXI.Sprite;
+			name: PIXI.Sprite;
+			rollingBomb: any; // NOTE: cloudkid.Emitter
+			tagpro: PIXI.Sprite;
+			tagproSparks: any; // NOTE: cloudkid.Emitter
+			tagproTint: PIXI.Graphics;
+			selfDestructSoon: any; //NOTE: cloudkid.Emitter
+		};
 	}
 
 	interface Position {
@@ -241,7 +292,9 @@ declare namespace TagPro {
 		NotStarted = 3
 	}
 
-	interface Tiles {
+	interface Tiles extends Array<any> {
+		image;
+
 		draw(container: PIXI.DisplayObjectContainer, tile: string|number, position: Position, width: number, height: number): void;
 		drawLayers(container, x, y, position, container2): void;
 		getTexture(tileId): void;
@@ -295,19 +348,22 @@ declare namespace TagPro {
 	}
 
 	interface Renderer {
-		options: Options;
-		drawStartingSplats(): void;
-		particleDefinitions: ParticleDefinitions;
-
 		canvas: HTMLCanvasElement;
 		canvas_height: number;
 		canvas_width: number;
-		stage: any;
-
-		vpWidth: number;
-		vpHeight: number;
-
 		debug: boolean;
+		options: Options;
+		particleDefinitions: ParticleDefinitions;
+		type: number;
+		vpHeight: number;
+		vpWidth: number;
+
+		backgroundChunks: Array<PIXI.Sprite>;
+		gameContainer: PIXI.DisplayObjectContainer;
+		particleFireTexture: PIXI.Texture;
+		particleTexture: PIXI.Texture;
+		renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer;
+		stage: PIXI.Stage;
 
 		/**
 		 * Holds all map elements that we want to be able to update.
@@ -342,7 +398,7 @@ declare namespace TagPro {
 		layers: Layers;
 		zoomThreshold: number;
 
-		addPlayerSprite(player): void;
+		addPlayerSprite(player: Player): void;
 
 		addSplat(team, x, y, fadeAway): void;
 
@@ -359,7 +415,7 @@ declare namespace TagPro {
 
 		checkIfVisible(): boolean;
 
-		checkSelfDestruct(player): void;
+		checkSelfDestruct(player: Player): void;
 
 		chunkifyBackground(renderTexture): void;
 
@@ -372,7 +428,7 @@ declare namespace TagPro {
 
 		createBackgroundTexture(container): void;
 
-		createBallSprite(player): void;
+		createBallSprite(player: Player): void;
 
 		createExplosion(x, y): void;
 
@@ -397,15 +453,16 @@ declare namespace TagPro {
 
 		/**
 		 * Creates the overlay DisplayObjectContainer and appends itself to the specified container.
-		 * @param container {PIXI.DisplayObjectContainer} The container to put the foreground in.
+		 *
+		 * @param {PIXI.DisplayObjectContainer} container - The container to put the foreground in.
 		 */
 		createOverlay(container): void;
 
 		createParticle(selector): PIXI.Texture;
 
-		createPlayerEmitter(player): void;
+		createPlayerEmitter(player: Player): void;
 
-		createPlayerSprite(player): void;
+		createPlayerSprite(player: Player): void;
 
 		/**
 		 * Creates the renderer. Currently this only uses the autoDetectRenderer,
@@ -431,27 +488,38 @@ declare namespace TagPro {
 
 		drawBallPop(x, y, team): void;
 
-		drawDegree(player): void;
+		drawDegree(player: Player): void;
 
 		drawDynamicTile(x, y): void;
 
 		drawDynamicTiles(): void;
 
-		drawFlair(player): void;
+		drawFlair(player: Player): void;
 
 		/**
 		 * Draws the marsball sprite if it doesn't already exist.
 		 *
-		 * @param object {object} The marsball object created by
-		 * @param position {object} A simple object vector. x and y.
+		 * @param {object} object - The marsball object created by
+		 * @param {Position} position - A simple object vector. x and y.
 		 */
 		drawMarsball(object, position: Position): void;
 
-		drawName(player, forceRedraw): void;
+		drawName(player: Player, forceRedraw: boolean): void;
 
-		drawPlayer(player): Position;
+		/**
+		 * Draws all the visible players and updates their attributes.
+		 *
+         * @param {Player} player - The player object.
+         * @param {PIXI.DisplayObjectContainer} context - The container to render into.
+		 */
+		drawPlayer(player: Player, context: PIXI.DisplayObjectContainer): Position;
 
-		drawPlayers(context): void;
+		/**
+		 * Simply calls tr.drawPlayer on all the players.
+		 *
+         * @param {PIXI.DisplayObjectContainer} context - The container to render into.
+		 */
+		drawPlayers(context: PIXI.DisplayObjectContainer): void;
 
 		drawSpawn(x: number, y: number, team: number, timeout: number): void;
 
@@ -459,9 +527,10 @@ declare namespace TagPro {
 
 		drawStartingSplats(): void;
 
-		getFlairTexture(cacheKey, flair): PIXI.Texture;
 
-		getLockedPosition(player): Position;
+		getFlairTexture(cacheKey: string, flair: Object): PIXI.Texture;
+
+		getLockedPosition(player: Player): Position;
 
 		handleMapUpdate(data: Array<Position>): void;
 
@@ -504,7 +573,7 @@ declare namespace TagPro {
 		 */
 		sayHello(): void;
 
-		setupPlayerSprites(player): void;
+		setupPlayerSprites(player: Player): void;
 
 		/**
 		 * Starts the renderer and rendering loop.
@@ -517,11 +586,11 @@ declare namespace TagPro {
 
 		updateCamera(id): void;
 
-		updateCameraPosition(player): void;
+		updateCameraPosition(player: Player): void;
 
 		updateCameraZoom(): void;
 
-		updateDeathStatus(player, drawPos): void;
+		updateDeathStatus(player: Player, drawPos): void;
 
 		updateEmitters(): void;
 
@@ -529,35 +598,35 @@ declare namespace TagPro {
 
 		updateFadingSplats(): void;
 
-		updateFlagsFromPlayer(player): void;
+		updateFlagsFromPlayer(player: Player): void;
 
 		updateGraphics(): void;
 
-		updateGrip(player, context, drawPos): void;
+		updateGrip(player: Player, context: PIXI.DisplayObjectContainer, drawPos: Position): void;
 
 		updateMarsBall(object, position): void;
 
 		updateObjects(): void;
 
-		updatePlayer(player): void;
+		updatePlayer(player: Player): void;
 
-		updatePlayerColor(player): void;
+		updatePlayerColor(player: Player): void;
 
-		updatePlayerEmitter(player): void;
+		updatePlayerEmitter(player: Player): void;
 
-		updatePlayerFlag(player): void;
+		updatePlayerFlag(player: Player): void;
 
-		updatePlayerPowerUps(player, context, drawPos): void;
+		updatePlayerPowerUps(player: Player, context: PIXI.DisplayObjectContainer, drawPos: Position): void;
 
-		updatePlayerSpritePosition(player): void;
+		updatePlayerSpritePosition(player: Player): void;
 
-		updatePlayerVisibility(player): void;
+		updatePlayerVisibility(player: Player): void;
 
 		updatePlayers(): void;
 
-		updateRollingBomb(player): void;
+		updateRollingBomb(player: Player): void;
 
-		updateTagpro(player): void;
+		updateTagpro(player: Player): void;
 
 		updatedynamicTile(update: Position): void;
 
