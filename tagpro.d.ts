@@ -1,7 +1,22 @@
+//
+// Declared as a module, e.g. `import tagpro from 'tagpro';`
+//
 declare module 'tagpro' {
 	var tagpro: TagPro.TagProStatic;
 	export default tagpro;
 }
+
+//
+// Declared as a variable on window, i.e. `window.tagpro`
+//
+declare interface Window {
+	tagpro: TagPro.TagProStatic;
+}
+
+//
+// Declared as a global variable, i.e. just `tagpro`.
+//
+declare var tagpro: TagPro.TagProStatic;
 
 declare namespace TagPro {
 	interface TagProStatic {
