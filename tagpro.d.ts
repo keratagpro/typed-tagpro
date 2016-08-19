@@ -293,12 +293,37 @@ declare namespace TagPro {
 		vpHeight: number;
 
 		debug: boolean;
+
+		/**
+		 * Holds all map elements that we want to be able to update.
+		 */
 		dynamicSprites: Object;
+
+		/**
+		 * A list of all particle emitters for efficient updating.
+		 */
 		emitters: Array<any>;
+
+		/**
+		 * A list of explosions, but only if particles are turned off.
+		 */
 		explosions: Array<PIXI.Graphics>;
+
+		/**
+		 * A list of splats that should be fading away over time.
+		 */
 		fadingSplats: Array<any>;
+
 		frameCount: number;
-		frameRates: Array<any>;
+
+		/**
+		 * A list of recent frame rates (calculated from tr.renderDelta) used to calculate
+		 */
+		frameRates: Array<number>;
+
+		/**
+		 * Holds all PIXI.DisplayObject instances that represent various layers of the playing field from background to UI.
+		 */
 		layers: Layers;
 		zoomThreshold: number;
 
@@ -459,6 +484,9 @@ declare namespace TagPro {
 		 */
 		resizeView(): void;
 
+		/**
+		 * Displays an opening console message.
+		 */
 		sayHello(): void;
 
 		setupPlayerSprites(player): void;
