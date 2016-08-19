@@ -14,3 +14,4 @@ import tagpro from 'tagpro'; // or: const tagpro = require('tagpro');
 tagpro.<IntelliSense happens>
 ```
 
+![Screenshot](example.png)
