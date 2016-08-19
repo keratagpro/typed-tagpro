@@ -1,18 +1,25 @@
 # TypeScript definitions for TagPro
 
-Install the definitions in your userscript project:
-
-```bash
-typings install --save --global github:keratagpro/typed-tagpro
-```
-
-Then use an editor that supports TypeScript definition files, like [Visual Studio Code](https://code.visualstudio.com/).
-
-```js
-tagpro.<IntelliSense happens>
-```
-
 ![Screenshot](example.png)
+
+The TagPro TypeScript definitions file helps with auto-completion (IntelliSense) when developing
+TagPro userscripts. It works with both JavaScript and TypeScript projects, as long as
+your code editor supports TypeScript definitions. I recommend
+[Visual Studio Code](https://code.visualstudio.com/).
+
+## Usage
+
+1. Install the [typings](http://www.npmjs.com/packages/typings) npm package:
+
+		npm install typings --global
+
+2. Install the tagpro definitions in your userscript project:
+
+		typings install --save --global github:keratagpro/typed-tagpro
+
+3. Use the `tagpro` object in your code:
+
+		tagpro.<IntelliSense happens>
 
 ## NOTES
 
