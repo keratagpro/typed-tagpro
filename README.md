@@ -24,6 +24,7 @@ your code editor supports TypeScript definitions. I recommend
 ## NOTES
 
 The definition file exports the tagpro object in three different ways:
+
 1. As a module, so you can import it using e.g. `import tagpro from 'tagpro';` or `const tagpro = require('tagpro');`.
 2. As a variable on window (`window.tagpro`).
 3. As a global variable (`tagpro`).
