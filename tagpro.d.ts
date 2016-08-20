@@ -1,8 +1,12 @@
 //
+// Declared as a global variable, i.e. just `tagpro`.
+//
+declare var tagpro: TagPro;
+
+//
 // Declared as a module, e.g. `import tagpro from 'tagpro';`
 //
 declare module 'tagpro' {
-	var tagpro: TagPro.TagProStatic;
 	export default tagpro;
 }
 
@@ -10,83 +14,80 @@ declare module 'tagpro' {
 // Declared as a variable on window, i.e. `window.tagpro`
 //
 declare interface Window {
-	tagpro: TagPro.TagProStatic;
+	tagpro: TagPro;
 }
 
-//
-// Declared as a global variable, i.e. just `tagpro`.
-//
-declare var tagpro: TagPro.TagProStatic;
+declare class TagPro {
+	disableControls: boolean;
+	music: boolean;
+	resourcesLoaded: boolean;
+	sound: boolean;
+	spectator: boolean;
+
+	gameSocket: any;
+	host: string;
+	musicHost: string;
+	rawSocket: SocketIO.Socket;
+	serverHost: string;
+	serverPort: number;
+	socket: TagPro.Socket;
+	socketHost: string;
+	socketPort: number;
+
+	events: TagPro.Events;
+	helpers: TagPro.Helpers;
+	keys: TagPro.Keys;
+	objects: { [id: string]: PIXI.DisplayObjectContainer };
+	particleDefinitions: TagPro.ParticleDefinitions;
+	players: { [id: string]: TagPro.Player };
+	settings: TagPro.Settings;
+	soundTiles: TagPro.SoundTiles;
+	teamNames: { blueTeamName: string; redTeamName: string; };
+	tiles: TagPro.Tiles;
+
+	floorMap: Array<Array<number>>;
+	map: TagPro.Map;
+	wallMap: Array<Array<Array<number|string>>>;
+
+	chat: TagPro.Chat;
+	fps: number;
+	gameEndsAt: Date;
+	group: TagPro.Group;
+	kick: TagPro.Kick;
+	musicPlayer: TagPro.MusicPlayer;
+	ping: TagPro.Ping;
+	playerId: number;
+	renderer: TagPro.Renderer;
+	score: { b: number; r: number; };
+	spectators: number;
+	state: TagPro.State;
+	ui: TagPro.UI;
+	version: string;
+	viewport: TagPro.Viewport;
+	volume: number;
+	world: TagPro.World;
+	zoom: number;
+	zooming: number;
+
+	TILE_SIZE: number;
+
+	ready: {
+		(callback): void;
+		after(callback): void;
+	};
+
+	_afterReadyCallbacks: Array<any>;
+
+	createSocket(): TagPro.Socket;
+	joinGame(): void;
+	playSound(name): void;
+	sendKeyPress(direction: string, released: boolean): void;
+	showOptions(): void;
+	stopSound(sound: string): void;
+	updateSounds(): void;
+}
 
 declare namespace TagPro {
-	interface TagProStatic {
-		disableControls: boolean;
-		music: boolean;
-		resourcesLoaded: boolean;
-		sound: boolean;
-		spectator: boolean;
-
-		gameSocket: any;
-		host: string;
-		musicHost: string;
-		rawSocket: SocketIO.Socket;
-		serverHost: string;
-		serverPort: number;
-		socket: Socket;
-		socketHost: string;
-		socketPort: number;
-
-		events: Events;
-		helpers: Helpers;
-		keys: Keys;
-		objects: { [id: string]: PIXI.DisplayObjectContainer };
-		particleDefinitions: ParticleDefinitions;
-		players: { [id: string]: Player };
-		settings: Settings;
-		soundTiles: SoundTiles;
-		teamNames: { blueTeamName: string; redTeamName: string; };
-		tiles: Tiles;
-
-		floorMap: Array<Array<number>>;
-		map: Map;
-		wallMap: Array<Array<Array<number|string>>>;
-
-		chat: Chat;
-		fps: number;
-		gameEndsAt: Date;
-		group: Group;
-		kick: Kick;
-		musicPlayer: MusicPlayer;
-		ping: Ping;
-		playerId: number;
-		renderer: Renderer;
-		score: { b: number; r: number; };
-		spectators: number;
-		state: State;
-		ui: UI;
-		version: string;
-		viewport: Viewport;
-		volume: number;
-		world: World;
-		zoom: number;
-		zooming: number;
-
-		TILE_SIZE: number;
-
-		ready: {
-			(callback): void;
-			after(callback): void;
-		};
-
-		createSocket(): Socket;
-		joinGame(): void;
-		playSound(name): void;
-		sendKeyPress(direction: string, released: boolean): void;
-		showOptions(): void;
-		stopSound(sound: string): void;
-		updateSounds(): void;
-	}
-
 	interface Chat {
 		resize(): void;
 	}
